@@ -12,7 +12,8 @@ function orderCake() {
 
 // Global State
 const initialState = {
-    numberOfCakes: 10
+    numberOfCakes: 10,
+    anotherProperty: 21
 }
 // Reducer
 //  (previousState, action) => newState
@@ -20,6 +21,7 @@ const reducer = (state=initialState, action) => {
     switch (action.type) {
         case CAKE_ORDERED:
             return {
+                ...state, // COPY of the state object by spreading it.
                 numberOfCakes: state.numberOfCakes - 1
             }
         default:
