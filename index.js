@@ -1,8 +1,13 @@
 const redux = require("redux");
 const createStore = redux.createStore();
-const bindActionCreators = redux.bindActionCreators()
+const bindActionCreators = redux.bindActionCreators();
+const combineReducers = redux.combineReducers();
+
 // Action constants
 const CAKE_ORDERED = "CAKE_ORDERED";
+const CAKE_RESTOCK = "CAKE_RESTOCK";
+const ICECREAM_ORDERED = "ICECREAM_ORDERED";
+const ICECREAM_RESTOCK = "ICECREAM_RESTOCK";
 
 // Action Creator is a function that return a Action object
 function orderCake() {
@@ -19,31 +24,74 @@ function restockCake(qty = 1) {
     payload: qty,
   };
 }
+
+function orderIceCream(qty = 1) {
+  return {
+    type: ICECREAM_ORDERED,
+    payload: qty,
+  };
+}
+
+function restockIceCream(qty = 1) {
+  return {
+    type: CAKE_RESTOCK,
+    payload: qty,
+  };
+}
+
 // Global State
-const initialState = {
+// const initialState = {
+//   numberOfCakes: 10,
+//   numberOfIce: 21,
+// };
+
+const initialCakeState = {
   numberOfCakes: 10,
-  anotherProperty: 21,
 };
+
+const initialIceCreamState = {
+  numberOfIce: 21,
+};
+
 // Reducer
 //  (previousState, action) => newState
-const reducer = (state = initialState, action) => {
+const cakeReducer = (state = initialCakeState, action) => {
   switch (action.type) {
-    case CAKE_ORDERED:
-      return {
-        ...state, // COPY of the state object by spreading it.
-        numberOfCakes: state.numberOfCakes - 1,
-      };
     case CAKE_RESTOCK:
       return {
         ...state, // COPY of the state object by spreading it.
         numberOfCakes: state.numberOfCakes + action.payload,
+      };
+    case CAKE_ORDERED:
+      return {
+        ...state, // COPY of the state object by spreading it.
+        numberOfIce: state.numberOfIce - 1,
       };
     default:
       return state;
   }
 };
 
-const store = createStore(reducer);
+const iceCreamReducer = (state = initialIceCreamState, action) => {
+  switch (action.type) {
+    case ICECREAM_ORDERED:
+      return {
+        ...state, // COPY of the state object by spreading it.
+        numberOfCakes: state.numberOfCakes - 1,
+      };
+    case ICECREAM_RESTOCK:
+      return {
+        ...state, // COPY of the state object by spreading it.
+        numberOfIce: state.numberOfIce + action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
+const rootReducer = combineReducers({cake: cakeReducer, ice: iceCreamReducer});
+
+const store = createStore(rootReducer);
 console.log("Initial state ", store.getState());
 
 const unsubscribe = store.subscribe(() => {
@@ -57,10 +105,19 @@ const unsubscribe = store.subscribe(() => {
 // store.dispatch(restockCake());
 // store.dispatch(restockCake());
 
-const actions = bindActionCreators({orderCake, restockCake}, store.dispatch);
-actions.orderCake()
+const actions = bindActionCreators(
+  { orderCake, restockCake, orderIceCream, restockIceCream },
+  store.dispatch
+);
+
+
 actions.orderCake();
 actions.orderCake();
-actions.restockCake();
+actions.orderCake();
+actions.restockCake(3);
+actions.orderIceCream();
+actions.orderIceCream();
+actions.orderIceCream();
+actions.restockIceCream(2);
 
 unsubscribe();
